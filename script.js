@@ -102,15 +102,19 @@ const getTheDateDiff = (date1, date2) =>
   Math.round(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
 
 const dateFormatting = (getTheFullDate, locale) => {
-  const dateDiffCalc = getTheDateDiff(new Date(), getTheFullDate);
+  if (!(getTheFullDate instanceof Date) || isNaN(getTheFullDate.getTime())) {
+    console.error('Invalid date:', getTheFullDate);
+    return 'Invalid date';
+  }
+
+  const now = new Date();
+  const dateDiffCalc = getTheDateDiff(now, getTheFullDate);
+
   if (dateDiffCalc === 0) return 'Today';
   else if (dateDiffCalc === 1) return 'Yesterday';
   else if (dateDiffCalc === 2) return '2 days ago';
-  else if (dateDiffCalc <= 7) return 'Last Week';
+  else if (dateDiffCalc <= 7) return `${dateDiffCalc} days ago`;
 
-  // const day = `${getTheFullDate.getDate()}`.padStart(2, 0);
-  // const month = `${getTheFullDate.getMonth() + 1}`.padStart(2, 0);
-  // const year = getTheFullDate.getFullYear();
   return new Intl.DateTimeFormat(locale).format(getTheFullDate);
 };
 
@@ -173,7 +177,7 @@ const calcDisplaySummary = function (acc) {
   labelSumInterest.textContent = `${formattedSts}`;
 };
 
-const accounts = [account1, account2, account3, account4];
+const accounts = [account1, account2, account3];
 const createUserNames = function (accounts) {
   accounts.forEach((account) => {
     account.userName = account.owner
@@ -202,7 +206,7 @@ let currentAccount, timerUpdate;
 const now = new Date();
 
 const userLogOut = () => {
-  let startTime = 10; // starting time in seconds
+  let startTime = 5 * 60; // starting time in seconds
 
   const intervalStartBegin = () => {
     let min = String(Math.trunc(startTime / 60)).padStart(2, '0');
